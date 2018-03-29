@@ -1,0 +1,13 @@
+[B]Version 2.0.0[/B] - 29 March 2018
+Fix for Antikvarium.hu changes to html code
+Fix of error at opening options
+Better search url generation
+
+[B]Version 1.0.1[/B] - 17 Oct 2012
+Fix for Antikvarium.hu changes to html code
+Recognizes some of the languages too
+Corrected plugin configuration name
+Raised max number of results to 20
+
+[B]Version 1.0[/B] - 18 May 2011
+Initial release of plugin
