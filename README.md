@@ -1,5 +1,6 @@
 # Calibre_Antikvarium_hu
-This plugin has been created to download metadata and cover image from Antikvarium.hu.
+This [Calibre](https://calibre-ebook.com/) plugin has been created to download metadata and cover image from Antikvarium.hu.
+It was abandonded 6 years ago and Antikvarium.hu site changed a lot. I fixed and updated to get work now.
 
 Original post from https://www.mobileread.com/forums/showthread.php?t=194094 by Kloon:
 I must give credits to the original author, Daermond for making and publishing the initial plugin, but sadly he had abandoned it, so here I am taking over and fixing the errors that have popped up since.
