@@ -11,7 +11,7 @@ Can retrieve title, author, series, ISBN, comments, tags, publisher, year of pub
 Shows multiple results if possible (3 by default, can be 1-20)
 Search based on ISBN if present, otherwise based on title and/or author
 
-##Special Notes:
+## Special Notes:
 Requires Calibre 0.8 or later. Tested with 3.2.0.0
 
 ## Installation Notes:
