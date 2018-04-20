@@ -1,5 +1,5 @@
 ﻿#!/usr/bin/env python
-# vim:fileencoding=UTF-8:ts=4:sw=4:sta:et:sts=4:ai
+# vim:fileencoding=utf-8:ts=4:sw=4:sta:et:sts=4:ai
 from __future__ import (unicode_literals, division, absolute_import,
 						print_function)
 
@@ -304,7 +304,7 @@ class Worker(Thread): # Get details
 		try:
 			book_cover = root.xpath('//*[@class="konyvadatlapfoto"]/img/@src')
 			if book_cover:
-				return book_cover[0]
+				return 'https://www.antikvarium.hu/%s'%(book_cover[0])
 		except:
 			return None
 		
