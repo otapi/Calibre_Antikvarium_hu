@@ -11,6 +11,7 @@ import time
 from Queue import Queue, Empty
 from lxml.html import fromstring
 from calibre import as_unicode
+import lxml.etree as etree
 from calibre.ebooks.metadata import check_isbn
 from calibre.ebooks.metadata.sources.base import Source, Option
 from calibre.utils.icu import lower
@@ -24,7 +25,7 @@ class Antikvarium_hu(Source):
 	name					= 'Antikvarium_hu'
 	description				= _('Downloads metadata and cover from antikvarium.hu')
 	author					= 'Hoffer Csaba & Kloon & otapi'
-	version					= (2, 0, 0)
+	version					= (2, 0, 2)
 	minimum_calibre_version = (0, 8, 0)
 
 	capabilities = frozenset(['identify', 'cover'])
@@ -173,15 +174,42 @@ class Antikvarium_hu(Source):
 		return None
 		
 	def _parse_search_results(self, log, title, authors, root, matches, timeout):
-		results = root.xpath('//*[@id="searchResultKonyvCim-listas"]/@href')
+		results = root.xpath('//*[@class="book-data-holder-list"]')
 		
 		max_results = self.prefs[Antikvarium_hu.KEY_MAX_DOWNLOADS]
 		for result in results:
-			book_url = 'https://www.antikvarium.hu/' + result
-			log.info('Book URL: %r'%book_url)		
+			urls = result.xpath('//*[@id="searchResultKonyvCim-listas"]/@href')
+			book_url = 'https://www.antikvarium.hu/' + urls[0]
+			log.info('Book URL: %r'%book_url)
+			
+			titlenode = result.xpath('//*[@id="searchResultKonyvCim-listas"]/span')[0]
+			n_title = titlenode.text_content()
+			log.info('Book title: %s'%n_title)
+
+			authorenode = result.xpath('//*[@id="searchResultKonyvSzerzo-listas"]')[0]
+			etree.strip_tags(authorenode, 'snap')
+			n_author = authorenode.text_content()
+			log.info('Book author: %s'%n_author)
+			
+			if title:
+				if title.lower() not in n_title.lower() and self.strip_accents(title) not in self.strip_accents(n_title):
+					continue
+			if authors:
+				if authors[0].lower() not in n_author.lower() and self.strip_accents(authors[0]) not in self.strip_accents(n_author):
+					continue
+
 			matches.append(book_url)
 			if len(matches) >= max_results:
 				return
+	
+	def strip_accents(self, s):
+		symbols = (u"öÖüÜóÓőŐúÚéÉáÁűŰíÍ",
+                   u"oOuUoOoOuUeEaAuUiI")
+
+		tr = dict( [ (ord(a), ord(b)) for (a, b) in zip(*symbols) ] )
+
+		return s.translate(tr).lower()
+    
 	def download_cover(self, log, result_queue, abort, title=None, authors=None, identifiers={}, timeout=30):
 		cached_url = self.get_cached_cover_url(identifiers)
 		if cached_url is None:
