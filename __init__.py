@@ -20,12 +20,13 @@ import lxml, sys, traceback
 from calibre import browser
 import urllib
 from lxml.html import tostring
+from string import maketrans   # Required to call maketrans function.
 
 class Antikvarium_hu(Source):
 	name					= 'Antikvarium_hu'
 	description				= _('Downloads metadata and cover from antikvarium.hu')
 	author					= 'Hoffer Csaba & Kloon & otapi'
-	version					= (2, 0, 2)
+	version					= (2, 0, 3)
 	minimum_calibre_version = (0, 8, 0)
 
 	capabilities = frozenset(['identify', 'cover'])
@@ -183,19 +184,31 @@ class Antikvarium_hu(Source):
 			log.info('Book URL: %r'%book_url)
 			
 			titlenode = result.xpath('//*[@id="searchResultKonyvCim-listas"]/span')[0]
-			n_title = titlenode.text_content()
+			n_title = '%s'%titlenode.text_content()
 			log.info('Book title: %s'%n_title)
 
 			authorenode = result.xpath('//*[@id="searchResultKonyvSzerzo-listas"]')[0]
 			etree.strip_tags(authorenode, 'snap')
-			n_author = authorenode.text_content()
+			n_author = '%s'%authorenode.text_content()
 			log.info('Book author: %s'%n_author)
 			
 			if title:
 				if title.lower() not in n_title.lower() and self.strip_accents(title) not in self.strip_accents(n_title):
 					continue
+
 			if authors:
-				if authors[0].lower() not in n_author.lower() and self.strip_accents(authors[0]) not in self.strip_accents(n_author):
+				author1 = authors[0]
+				authorsplit = author1.split(" ")
+				author2 = author1
+				if len(authorsplit) > 1:
+					author2 = '%s %s'%(authorsplit[1], authorsplit[0])
+				log.info('author1: %s'%author1)
+				log.info('n_author: %s'%n_author)
+				log.info('author2: %s'%author2)
+				if author1.lower() not in n_author.lower() \
+				and self.strip_accents(author1) not in self.strip_accents(n_author) \
+				and author2.lower() not in n_author.lower() \
+				and self.strip_accents(author2) not in self.strip_accents(n_author):
 					continue
 
 			matches.append(book_url)
@@ -204,12 +217,12 @@ class Antikvarium_hu(Source):
 	
 	def strip_accents(self, s):
 		symbols = (u"öÖüÜóÓőŐúÚéÉáÁűŰíÍ",
-                   u"oOuUoOoOuUeEaAuUiI")
+					u"oOuUoOoOuUeEaAuUiI")
 
 		tr = dict( [ (ord(a), ord(b)) for (a, b) in zip(*symbols) ] )
 
 		return s.translate(tr).lower()
-    
+
 	def download_cover(self, log, result_queue, abort, title=None, authors=None, identifiers={}, timeout=30):
 		cached_url = self.get_cached_cover_url(identifiers)
 		if cached_url is None:
